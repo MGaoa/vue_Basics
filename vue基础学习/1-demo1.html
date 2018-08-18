@@ -1,0 +1,218 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./vue2.js"></script>
+    <script src="./axios.js"></script>
+    <style>
+        #app {
+          width: 600px;
+          margin: 10px auto;
+        }
+    
+        .tb {
+          border-collapse: collapse;
+          width: 100%;
+        }
+    
+        .tb th {
+          background-color: #0094ff;
+          color: white;
+        }
+    
+        .tb td,
+        .tb th {
+          padding: 5px;
+          border: 1px solid black;
+          text-align: center;
+        }
+    
+        .add {
+          padding: 5px;
+          border: 1px solid black;
+          margin-bottom: 10px;
+        }
+        .tipBox {
+          width: 200px;
+          height: 100px;
+          background-color: green;
+          position: absolute;
+          top: 50%;
+          left:50%;
+        }
+      </style>
+</head>
+<body>
+<div id="app">
+    <div class="add">
+      编号:<input type="text" v-model="newId" ref="inputRefId"> 
+      品牌名称: <input type="text" v-model="newName">
+      <input type="button" value="添加" @click="addData">
+    </div>
+
+    <div class="add">
+      品牌名称:
+      <input type="text" placeholder="请输入搜索条件" v-model="searchVal">
+    </div>
+
+    <div>
+      <table class="tb">
+        <tr>
+          <th>编号</th>
+          <th>品牌名称</th>
+          <th>创立时间</th>
+          <th>操作</th>
+        </tr>
+        <tr v-for="(item,index) in newList" :key="index">
+            <td>{{item.id}}</td>
+            <td>{{item.name}}</td>
+            <td>{{item.ctime | fmTime('/')}}</td>
+            <td><a href="#" @click="showBox(item.id,index)">删除</a></td>
+        </tr>
+        <tr v-if="list.length===0">
+          <td colspan="4">没有品牌数据</td>
+        </tr>
+        <!-- 动态生成内容tr -->
+      </table>
+    </div>
+      <div>computed计算属性的使用</div>
+    <div>
+      <input type="text" v-model="one">
+      <input type="text" v-model="two">
+      <div>{{add}}</div>
+    </div>
+    <div>
+      <div>watch的使用</div>
+    </div>
+    <div>
+      {{watchAdd}}
+    </div>
+    <div>深度监听</div>
+    <div><input type="text" v-model="user.name"></div>
+
+    <div class="tipBox" v-if="isShow">
+      <p>是否删除{{tempId}}号</p>
+      <button @click="sure">确定</button>
+      <button @click="cancel">取消</button>
+    </div>
+  </div>
+</body>
+
+
+<script>
+
+  Vue.filter('fmTime', function(time, seprator) {
+    var y = time.getFullYear();
+    var m = time.getMonth()+1;
+    var d = time.getDay();
+    return y + seprator + m + seprator + d;
+  })
+
+    var vm = new Vue({
+        el: '#app',
+        data: {
+            one: "",
+            two: "",
+            newId: "",
+            newName: "",
+            watchAdd: '',
+            searchVal: '',
+            isShow: false,
+            tempId:'',
+            tempIndex:'',
+            user: {
+              name: 'jack'
+            },
+            list: [
+                {id: 1, name: 'CC', ctime: new Date()},
+                {id: 2, name: 'LV', ctime: new Date()},
+                {id: 3, name: 'AA', ctime: new Date()},
+            ] 
+        },
+        mounted () {
+          this.$refs.inputRefId.focus();
+
+          //在程序一上来就调用这个函数
+          // this.getData()
+        },
+        methods: {
+            deleteData(idx) {
+                this.list.splice(idx,1)
+            },
+            addData() {
+                this.list.push({id: this.newId,name: this.newName, ctime: new Date()});
+                this.newId = '';
+                this.newName = '';
+            },
+
+            //这个是axios发送请求然后返回数据赋值给data里的list
+            // getData() {
+            //   axios.get('http://jspang.com/DemoApi/oftenGoods.php')
+            //     .then(res=>{
+            //         console.log(res)
+            //         this.list = res.data
+            //     })
+            //     .catch(err=>{
+            //         console.log(err)
+            //     })
+            // }
+              
+
+              showBox(id,index) {
+                this.isShow = !this.isShow;
+                this.tempId = id;
+                this.tempIndex = index;
+              },
+              sure() {
+                this.isShow = false
+                this.deleteData(this.tempIndex);
+              },
+              cancel() {
+                this.isShow = false
+              }
+            
+        },
+        computed: {
+          add() {
+            return this.one + this.two;
+          },
+          newList() {
+
+            //ES5的写法
+
+            // var that = this;
+            // function contStr(value) {
+            //   return value.name.indexOf(that.searchVal) !== -1
+            // }
+            // var temp = this.list.filter(contStr);
+            // return temp;
+
+
+            //ES6的写法
+
+            return this.list.filter(value=>value.name.indexOf(this.searchVal)!==-1);
+          }
+        },
+        watch: {
+          // one(newVal, oldVal) { 
+          //  this.watchAdd = newVal + this.two
+          // },
+          // two(newVal, oldVal) {
+          //   this.watchAdd = this.one + newVal
+          // },
+
+          //深度时时监听，主要负责异步操作
+          user: {
+            handler(newVal) {
+              console.log("改变了");
+              console.log(newVal)
+            },
+            deep: true
+          }
+        }   
+    })
+</script>
+</html>

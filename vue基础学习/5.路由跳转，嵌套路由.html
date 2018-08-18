@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="vue2.js"></script>
+    <script src="vue-router.js"></script>
+        <!-- 1.引入路由 -->
+</head>
+<body>
+    <div id="app">
+        <!-- 5.路由挖坑 ,路径匹配到的组件都会渲染到这里来-->
+             <router-view></router-view>
+
+
+
+             <div>
+                 <ul>
+                     <li>
+                         <router-link to="/index">首页</router-link>
+                     </li>
+                     <li>
+                         <router-link to="/eat">美食</router-link>
+                     </li>
+                     <li>
+                         <router-link to="/other/11">其他1</router-link>
+                     </li>
+                     <li>
+                         <router-link to="/other/22">其他2</router-link>
+                     </li>
+                     <li>
+                         <router-link to="/other/33">其他3</router-link>
+                     </li>
+                 </ul>
+             </div>
+    </div>
+
+    <script>
+        //2.创建所需组件
+        var index = Vue.component('index',{
+            template: '<div>我是index页面</div>'
+        })
+        var eat = Vue.component('eat',{
+            template: '<div>我是eat页面</div>'
+        })
+//嵌套路由2.创建子路由组件
+        var cookBoox = Vue.component('cookBoox', {
+            template: '<div>我是更多选项..</div>'
+        })
+        var other = Vue.component('other',{
+            data () {
+                return {
+                    pullpage: ''
+                }
+            },
+// 嵌套路由3.挖坑 <router-view></router-view>
+            template: `
+                        <div>
+                            我是other{{$route.params.id}}页面
+                            <p>{{pullpage}}<button @click="jump">查看食谱</button></p>       
+                           <router-view></router-view>
+                        </div>
+            `,
+            methods: {
+              jump() {
+                  this.$router.push({name: 'cookBoox'})
+//嵌套路由：4.打开哪个子组件就写哪个名字
+              }  
+            },
+            watch: {
+                '$route'(to, from) {
+                    if(to.params.id === '11') {
+                        this.pullpage = '蔬菜页面...';
+                        console.log(this.pullpage)
+                    }else if(to.params.id === '22') {
+                        this.pullpage = '肉类页面...'                   
+                    }else {
+                        this.pullpage = '水果页面...'
+                    }
+                }
+            }
+        })
+        //3.创建路由并配置路由规则
+        var router = new VueRouter({
+            //这里要注意啊，这个是routes
+            routes:[
+                {name: 'index',path: '/index',component: index},
+                {name: 'eat',path: '/eat',component: eat},
+                {name: 'other',path: '/other/:id',component: other,
+//嵌套路由                    //嵌套路由： 1.写子路由
+                    children: [
+                        //path里面不能写/
+                        {name:'cookBoox',path: 'cookBoox',component: cookBoox}
+                    ]
+                },
+//路由重定向                
+                {name: 'defalt',path: '*', redirect: 'eat'}
+            ]
+        })
+        var vm = new Vue({
+            el: '#app',
+            router,//4.挂载路由
+            data: {
+
+            }
+        })
+    </script>
+</body>
+</html>

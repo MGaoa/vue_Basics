@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+    <script src="./vue2.js"></script>
+    <script src="./axios.js"></script>
+    <!-- <style>
+    .slide-enter,
+    .slide-leave-to {
+        padding-left: 200px;
+    }
+    .slide-enter-active,
+    .slide-leave-active {
+        transition: all 3s;
+    }
+    .slide-enter-to,
+    .slide-leave {
+        padding-left: 0;
+    }
+    </style> -->
+</head>
+<body>
+    <div id="app">
+        <!-- <transition name="slide">
+            <div v-if="isShow">cat</div>
+        </transition> -->
+
+
+        <transition
+        v-on:before-enter="beforeEnter"
+        v-on:enter="enter"
+        v-on:after-enter="afterEnter"
+
+        v-on:before-leave="beforeLeave"
+        v-on:leave="leave"
+        v-on:after-leave="afterLeave">
+            <div v-if="isShow">cat</div>
+        </transition>
+        <button @click="isShow = !isShow">点我切换</button>
+    </div>
+    <script>
+        var vm = new Vue({
+            el: '#app',
+            data: {
+                isShow: true
+            },
+            mounted () {
+                // axios.get('http://jspang.com/DemoApi/oftenGoods.php')
+                // .then(res=>{
+                //     console.log(res)
+                // })
+                // .catch(err=>{
+                //     console.log(err)
+                // })
+
+                // axios.post('http://157.122.54.189:9093/api/addproduct',{
+                //     name: 'haha'
+                // })
+                // .then(res=>{
+                //     console.log(res)
+                // })
+                // .catch(err=>{
+                //     console.log(err)
+                // })
+            },
+            methods: {
+
+                //动画的钩子函数
+                beforeEnter(el) {
+                    el.style.paddingLeft = '100px';
+                    console.log('beforeEnter')
+                },
+                enter(el,done) {
+                    var step = 1;
+                    var interval = setInterval(()=>{
+                        el.style.paddingLeft = (100-step) + 'px';
+                        step++;
+                        if(step === 100) {
+                            clearInterval;
+                            done()
+                        }
+                    },10)
+                    
+                    console.log('Enter')
+                },
+                afterEnter(el) {
+                    console.log('afterEnter')
+                },
+                beforeLeave(el) {
+                    el.style.paddingLeft = '0px'
+                    console.log('beforeLeave')
+                },
+                leave(el,done) {
+                    var step = 1;
+                    var interval = setInterval(()=>{
+                        el.style.paddingLeft = (0+step) + 'px';
+                        step++;
+                        if(step === 100) {
+                            clearInterval;
+                            done()
+                        }
+                    },10)
+                   
+                    console.log('leave')
+                },
+                afterLeave(el) {
+                    
+                    console.log('afterLeave')
+                }
+            }
+        })
+    </script>
+</body>
+</html>
